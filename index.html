@@ -2,70 +2,150 @@
 <html>
 
 <head>
-	<title>You Should Play</title>
-	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<title>Twitch Surfer</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="./config.json"></script>
+	<link type="text/css" rel="stylesheet" href="css/main.css" />
 </head>	
 
 <body>	
+	<div id = "bigdiv">
+		<br>
+		<h1 id="title"></h1>
+		<div class="center">
+			<p id="deck"></p>
+			<h1 id="introTitle">What is this?</h1>
+			<p id="intro">This website provides users with a random live stream of a game currently being played on Twitch.tv. Some basic information about the game is provided, as well as links to purchase it from various sources. A fresh new game is served up with each click of the button. </p>
+		</div>
+		<div></div>
+		<br>
+		<iframe id ="player"
+			height="504" 
+			width="896" 
+			align="middle"
+			frameborder="0" 
+			scrolling="no" 
+			class="hidden"
+			allowfullscreen>
+		</iframe>
+		<br>
+		<br>
+		<button id="newGame" type = "button" data-label="Start">do it!</button> 
+	</div>
+	<div class="rightbigdiv">
+		<div id="giantbomb" class="button_sliding_bg">Game Info</div>
+		<div id="twitch" class="button_sliding_bg">More Streams</div>
+		<div id="amazon" class="button_sliding_bg">Buy on Amazon</div>
+		<div id="steam" class="button_sliding_bg">Buy on Steam</div>
+	</div>
 
-	<button id="newGame" type = "button" onclick="getStream()">Start!</button> 
-	<br>
-	<h2 id="title"></h2>
-	<br>
-	<iframe id ="player"
-    height="504" 
-    width="896" 
-    frameborder="0" 
-    scrolling="no" 
-    class="hidden"
-    allowfullscreen>
-	</iframe>
+<script>
+	var loading = function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		e.target.classList.add('loading');
+		e.target.setAttribute('disabled','disabled');
+		setTimeout(function(){
+			e.target.classList.remove('loading');
+			e.target.removeAttribute('disabled');
+		},1500);
+	};
 
-	<script>
+	var btns = document.querySelectorAll('button');
+	for (var i=btns.length-1;i>=0;i--) {
+		btns[i].addEventListener('click',loading);
+	}
+</script>
+
+<script type="text/javascript" language="javascript"> 
+	$('#player').css('width', $(window).width()*.63+'px');
+	$('#player').css('height', $(window).height()*.63+'px');
+	/*$('.button_sliding_bg').css('height', $(window).width()*.09+'px');
+	$('.button_sliding_bg').css('width', $(window).width()*.09+'px');*/
+
+	$(function(){
+		$(window).load(function(){ // On load
+			$('.button_sliding_bg').css({'height':(($(window).height()*.21))+'px'});
+			$('.button_sliding_bg').css({'width':(($(window).height()*.21))+'px'});
+			$('#player').css({'height':(($(window).height()*.63))+'px'});
+			$('#player').css({'width':(($(window).width()*.63))+'px'});
+
+		});
+		$(window).resize(function(){ // On resize
+			$('.button_sliding_bg').css({'height':(($(window).height()*.21))+'px'});
+			$('.button_sliding_bg').css({'width':(($(window).height()*.21))+'px'});
+			$('#player').css({'height':(($(window).height()*.63))+'px'});
+			$('#player').css({'width':(($(window).width()*.63))+'px'});
+		});
+	});
+</script>
+
+<script type = "text/javascript" language = "javascript">
+
+	$(document).ready(function() { 
+		$("#player").hide();
+		var limit = 5;
 		function getRandomInt(min, max) {
-    		return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		};
 
-		function getStream() {
+		$("#newGame").click(function(){
+			$("#intro").hide();
+			$("#introTitle").hide();
+			$("#player").show();
+			var gameNum = getRandomInt(0,500);
+			var gameUrl = "https://api.twitch.tv/kraken/games/top?limit="+limit+"&offset=" + gameNum;
+			$.getJSON(gameUrl, function(result){
+				for (var i = 0; i < limit; i++) {
+					giantbombId = result.top[i].game.giantbomb_id;
+					gameName = result.top[i].game.name;	
+					twitchId = result.top[i].game._id;
+					console.log(gameName + " gbid: " + giantbombId + " twitch id: " + twitchId);
+					if (giantbombId != 0) break;
+				};
+				var streamUrl = "https://api.twitch.tv/kraken/streams?game="+ gameName;
+				$.getJSON(streamUrl, function(response){
+					streamNum = getRandomInt(0, Math.floor(response.streams.length, response._total)-1);
+					channelUrl = response.streams[streamNum].channel.url;
+					channelName = response.streams[streamNum].channel.name;
+					console.log(channelName + " " + channelUrl);
+					$("#title").text(gameName);
 
-			var gameNum = getRandomInt(0,500)
-			var gameUrl = "https://api.twitch.tv/kraken/games/top?limit=1&offset=" + gameNum
+					//get the description using jsonp callback to enable cross domain
+					var gbUrl = "http://www.giantbomb.com/api/game/3030-" + giantbombId + "/?api_key=" + config.gbapikey + "&field_list=deck, image&format=jsonp&json_callback=gameJson";
+					console.log(gbUrl);
+					$.ajax({url: gbUrl, 
+						dataType: 'jsonp', 
+						jsonpCallback: 'gameJson',
+						jsonp: false,
+						crossDomain: true,
+						error: function(gbresult){
+							alert("error");
+						}, 
+						success: function(gbresult){
+							$("#deck").text(gbresult.results.deck);
+						}
+					});
 
-			var xhr = new XMLHttpRequest();
-			xhr.open('GET', gameUrl, true)
-			xhr.send()
-			xhr.addEventListener("readystatechange", processRequest, false)
-			document.getElementById("newGame").innerHTML = "Load new game";
 
-			function processRequest(e) {
-				if (xhr.readyState == 4 && xhr.status == 200) {	
 
-					var response = JSON.parse(xhr.responseText);
-					 giantbomb_id = response.top[0].game.giantbomb_id;
-					 name = response.top[0].game.name;
-					 id = response.top[0].game._id;
 
-					console.log(giantbomb_id + " " + name + " " + id)
+					var source = "http://player.twitch.tv/?channel=" + channelName;
+					$("#player").attr("src", source);
+				});
 
-				}
-			}
+			});
+			
+			//so text doesn't change until after flip 
+			window.setTimeout(function () {
+		    	$('#newGame').attr('data-label', 'Flip channel');
+			}, 500);
+		});
 
-			var xmlhttp = new XMLHttpRequest();
-			var streamUrl = "https://api.twitch.tv/kraken/streams?game="+name;
-			console.log(streamUrl);
 
-			xmlhttp.onreadystatechange = function() {
-			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			    myArr = JSON.parse(xmlhttp.responseText);
-			    console.log(myArr.streams.length + " " + myArr._total);
-			    console.log(getRandomInt(0, Math.floor(myArr.streams.length, myArr._total)));
-			    }
-			};
+});
 
-			xmlhttp.open("GET", streamUrl, true);
-			xmlhttp.send();
-		}
-	</script>
+</script>
 </body>
 
 </html>

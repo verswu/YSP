@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>You Should Play</title>
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>	
+
+<body>	
+
+	<button id="newGame" type = "button" onclick="getStream()">Start!</button> 
+	<br>
+	<h2 id="title"></h2>
+	<br>
+	<iframe id ="player"
+    height="504" 
+    width="896" 
+    frameborder="0" 
+    scrolling="no" 
+    class="hidden"
+    allowfullscreen>
+	</iframe>
+
+	<script>
+		function getRandomInt(min, max) {
+    		return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+
+		function getStream() {
+
+			var gameNum = getRandomInt(0,500)
+			var gameUrl = "https://api.twitch.tv/kraken/games/top?limit=1&offset=" + gameNum
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', gameUrl, true)
+			xhr.send()
+			xhr.addEventListener("readystatechange", processRequest, false)
+			document.getElementById("newGame").innerHTML = "Load new game";
+
+			function processRequest(e) {
+				if (xhr.readyState == 4 && xhr.status == 200) {	
+
+					var response = JSON.parse(xhr.responseText);
+					 giantbomb_id = response.top[0].game.giantbomb_id;
+					 name = response.top[0].game.name;
+					 id = response.top[0].game._id;
+
+					console.log(giantbomb_id + " " + name + " " + id)
+
+				}
+			}
+
+			var xmlhttp = new XMLHttpRequest();
+			var streamUrl = "https://api.twitch.tv/kraken/streams?game="+name;
+			console.log(streamUrl);
+
+			xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			    myArr = JSON.parse(xmlhttp.responseText);
+			    console.log(myArr.streams.length + " " + myArr._total);
+			    console.log(getRandomInt(0, Math.floor(myArr.streams.length, myArr._total)));
+			    }
+			};
+
+			xmlhttp.open("GET", streamUrl, true);
+			xmlhttp.send();
+		}
+	</script>
+</body>
+
+</html>

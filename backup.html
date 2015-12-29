@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>You Should Play</title>
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>	
+
+<body>	
+
+	<button id="newGame" type = "button" onclick="getStream()">Start!</button> 
+	<br>
+	<h2 id="title"></h2>
+	<br>
+	<iframe id ="player"
+    height="504" 
+    width="896" 
+    frameborder="0" 
+    scrolling="no" 
+    class="hidden"
+    allowfullscreen>
+	</iframe>
+
+	<script>
+	function queue(len) {
+		var ret = [];
+
+		ret.push = function(a) {
+			if(ret.length ==len) ret.shift();
+			return Array.prototype.push.apply(this, arguments);
+		};
+
+		return ret;
+	}
+
+	var cache = queue(7);
+
+	function getStream() {
+		function getRandomInt(min, max) {
+    		return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+
+		var gameNum = getRandomInt(0,500)
+		var gameUrl = "https://api.twitch.tv/kraken/games/top?limit=1&offset=" + gameNum
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', gameUrl, true)
+		xhr.send()
+		xhr.addEventListener("readystatechange", processRequest, false)
+		document.getElementById("newGame").innerHTML = "Load new game";
+
+		function processRequest(e) {
+			if (xhr.readyState == 4 && xhr.status == 200) {	
+				var response = JSON.parse(xhr.responseText);
+				var streams = response.streams
+				var viableStream = null;
+				for (var i = 0; i < streams.length; i++) {
+					if (streams[i].game && !cache.includes(streams[i].game)) {
+						viableStream = streams[i];
+						cache.push(viableStream.game)
+						break
+					}
+				}
+				console.log(viableStream.game + ": " + viableStream.channel.url)
+				console.log(cache.toString())
+				document.getElementById("title").innerHTML = viableStream.game;
+				var source = "http://player.twitch.tv/?channel=" + viableStream.channel.name
+				document.getElementById("player").src=source
+			}
+		}
+	}
+	</script>
+</body>
+
+</html>

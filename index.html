@@ -10,14 +10,12 @@
 
 <body>	
 	<div id = "bigdiv">
-		<br>
 		<h1 id="title"></h1>
 		<div class="center">
 			<p id="deck"></p>
 			<h1 id="introTitle">What is this?</h1>
-			<p id="intro">This website provides users with a random live stream of a game currently being played on Twitch.tv. Some basic information about the game is provided, as well as links to purchase it from various sources. A fresh new game is served up with each click of the button. </p>
+			<p id="intro">This website provides users with a random live stream of a game currently being played on Twitch.tv. Some basic information about the game is provided, as well as links to purchase it from various sources. A fresh new stream is served each click. </p>
 		</div>
-		<div></div>
 		<br>
 		<iframe id ="player"
 			height="504" 
@@ -58,22 +56,17 @@
 </script>
 
 <script type="text/javascript" language="javascript"> 
-	$('#player').css('width', $(window).width()*.63+'px');
-	$('#player').css('height', $(window).height()*.63+'px');
-	/*$('.button_sliding_bg').css('height', $(window).width()*.09+'px');
-	$('.button_sliding_bg').css('width', $(window).width()*.09+'px');*/
-
 	$(function(){
 		$(window).load(function(){ // On load
-			$('.button_sliding_bg').css({'height':(($(window).height()*.21))+'px'});
-			$('.button_sliding_bg').css({'width':(($(window).height()*.21))+'px'});
+			$('.button_sliding_bg').css({'height':(($(window).height()*.20))+'px'});
+			$('.button_sliding_bg').css({'width':(($(window).height()*.20))+'px'});
 			$('#player').css({'height':(($(window).height()*.63))+'px'});
 			$('#player').css({'width':(($(window).width()*.63))+'px'});
 
 		});
 		$(window).resize(function(){ // On resize
-			$('.button_sliding_bg').css({'height':(($(window).height()*.21))+'px'});
-			$('.button_sliding_bg').css({'width':(($(window).height()*.21))+'px'});
+			$('.button_sliding_bg').css({'height':(($(window).height()*.20))+'px'});
+			$('.button_sliding_bg').css({'width':(($(window).height()*.20))+'px'});
 			$('#player').css({'height':(($(window).height()*.63))+'px'});
 			$('#player').css({'width':(($(window).width()*.63))+'px'});
 		});

@@ -3,7 +3,10 @@
 
 html, body{
 	background:#fafafa;
+	margin:0px; 
+	padding:0px;
 }
+
 * { 
 	font-family: 'Open Sans', sans-serif;
 	color: #333;
@@ -11,6 +14,7 @@ html, body{
 
 
 h1 {
+	font-family: 'OpenSansBold', sans-serif;
 	width: 100%;
 	text-align: center;
 }
@@ -19,6 +23,10 @@ p {
 	width: 100%;
 	text-align: center;
 	margin: 100 auto;
+}
+
+#player {
+	position relative;
 }
 
 #bigdiv {
@@ -34,7 +42,7 @@ p {
 
 .rightbigdiv{
 	float: right;
-	width: 15%;
+	width: 13%;
 }
 
 /*button*/
@@ -115,6 +123,7 @@ button.loading {
 }
 
 .button_sliding_bg {
+	float: right;
     color: #FFF;
     padding: 15px;
     font-family: 'OpenSansBold', sans-serif;
@@ -152,8 +161,7 @@ button.loading {
 	color: #333;
 }
 
-#steam{
-	background: url("../img/steam.png") no-repeat;
+#ebay{
+	background: url("../img/ebay.png") no-repeat;
 	background-size: contain;
-
 }
